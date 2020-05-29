@@ -37,11 +37,10 @@ export const Entity = {
       page_url = page_url || this.endpoint_url;
       entity_name = entity_name || this.entity_name;
       callback = (typeof callback === 'function' ? callback : () => {});
-      fetch(page_url)
-        .then(res => res.json())
+      axios(page_url)
         .then(res => {
-          if(res.data.length > 0) {
-            this.entities[entity_name] = res.data;
+          if(res.data.data.length > 0) {
+            this.entities[entity_name] = res.data.data;
             this.pagination[entity_name] = this.makePagination(res.meta, res.links);
             callback();
           }
@@ -61,10 +60,9 @@ export const Entity = {
 
     async fetchEntity(page_url) {
       page_url = page_url || this.endpoint_url;
-      return await fetch(page_url)
-        .then(res => res.json())
+      return await axios(page_url)
         .then(res => {
-            if(res.data) {
+            if(res.data.data) {
               return res;
             } else {
               return { message: 'nope' };
@@ -78,10 +76,9 @@ export const Entity = {
 
     async deleteEntity(id, page_url) {
       page_url = page_url || this.endpoint_url;
-      return await fetch(page_url + `/${id}`, {
+      return await axios(page_url + `/${id}`, {
         method: 'delete'
       })
-        .then(res => res.json())
         .then(data => {
           return data;
         })
@@ -97,14 +94,13 @@ export const Entity = {
       let method = (!this.edit ? 'post' : 'put');
       if(!contains_file) {
         let body = JSON.stringify(entity);
-        return await fetch(page_url, {
+        return await axios(page_url, {
           method: method,
           body: body,
           headers: {
             'Content-Type': 'application/json'
           }
         })
-          .then(res => res.json())
           .then(data => {
             return data;
           })
@@ -121,11 +117,10 @@ export const Entity = {
         if(this.edit) {
           body.append('_method', 'put');
         }
-        return await fetch(page_url, {
+        return await axios(page_url, {
           method: 'post',
           body: body
         })
-          .then(res => res.json())
           .then(data => {
             return data;
           })
