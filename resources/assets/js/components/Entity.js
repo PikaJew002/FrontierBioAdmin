@@ -41,7 +41,7 @@ export const Entity = {
         .then(res => {
           if(res.data.data.length > 0) {
             this.entities[entity_name] = res.data.data;
-            this.pagination[entity_name] = this.makePagination(res.meta, res.links);
+            this.pagination[entity_name] = this.makePagination(res.data.meta, res.data.links);
             callback();
           }
         })
@@ -76,11 +76,9 @@ export const Entity = {
 
     async deleteEntity(id, page_url) {
       page_url = page_url || this.endpoint_url;
-      return await axios(page_url + `/${id}`, {
-        method: 'delete'
-      })
-        .then(data => {
-          return data;
+      return await axios.delete(page_url + `/${id}`)
+        .then(res => {
+          return res.data;
         })
         .catch(err => {
           console.log(err);
@@ -94,15 +92,16 @@ export const Entity = {
       let method = (!this.edit ? 'post' : 'put');
       if(!contains_file) {
         let body = JSON.stringify(entity);
-        return await axios(page_url, {
+        return await axios({
+          url: page_url,
           method: method,
-          body: body,
+          data: body,
           headers: {
             'Content-Type': 'application/json'
           }
         })
-          .then(data => {
-            return data;
+          .then(res => {
+            return res.data;
           })
           .catch(err => {
             console.log(err + " Error with storeEntity(), using JSON");
@@ -117,12 +116,13 @@ export const Entity = {
         if(this.edit) {
           body.append('_method', 'put');
         }
-        return await axios(page_url, {
+        return await axios({
+          url: page_url,
           method: 'post',
-          body: body
+          data: body
         })
-          .then(data => {
-            return data;
+          .then(res => {
+            return res.data;
           })
           .catch(err => {
             console.log(err + " Error with storeEntity(), using FormData");
